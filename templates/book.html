@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Tickets - SwiftSeat</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #eef2f3; }
+        footer { background: #333; color: white; text-align: center; padding: 10px; margin-top: 30px; }
+    </style>
+    <script>
+        function generatePassengerFields() {
+            const num = document.getElementById('num_passengers').value;
+            const container = document.getElementById('passenger_fields');
+            container.innerHTML = '';
+            for (let i = 1; i <= num; i++) {
+                container.innerHTML += `
+                    <div class="mb-3">
+                        <label class="form-label">Passenger ${i} Name</label>
+                        <input type="text" name="passenger_name_${i}" class="form-control" required>
+                        <label class="form-label">Passenger ${i} Age</label>
+                        <input type="number" name="passenger_age_${i}" class="form-control" required>
+                    </div>`;
+            }
+        }
+    </script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">RideSwift</a>
+            <div>
+                <a class="nav-link d-inline text-white" href="/">Home</a>
+                <a class="nav-link d-inline text-white" href="/routes">Routes</a>
+                <a class="nav-link d-inline text-white" href="/history">Bookings</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h2 class="mb-4">Book Ticket - {{ route[1] }}</h2>
+        <form method="POST">
+            <div class="mb-3">
+                <label class="form-label">Your Name</label>
+                <input type="text" name="name" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="email" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phone</label>
+                <input type="text" name="phone" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Number of Passengers</label>
+                <input type="number" id="num_passengers" name="num_passengers" class="form-control" min="1" max="5" value="1" onchange="generatePassengerFields()" required>
+            </div>
+            <div id="passenger_fields"></div>
+            <div class="mb-3">
+                <label class="form-label">Date of Journey</label>
+                <input type="date" name="date" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-success">Confirm Booking</button>
+        </form>
+    </div>
+
+    <footer>
+        &copy; 2025 RideSwift Bus Booking | All Rights Reserved.
+    </footer>
+</body>
+</html>
