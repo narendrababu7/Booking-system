@@ -5,15 +5,20 @@
     <title>Booking History - RideSwift</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background: #f8f9fa; }
-        table { background: white; }
+        body { background: #f8f9fa; font-family: Arial, sans-serif; }
+        .table-container { max-height: 500px; overflow-y: auto; }
+        table { background: white; border-radius: 8px; overflow: hidden; }
+        thead { position: sticky; top: 0; background: #007bff; color: white; }
+        tbody tr:hover { background: #f1f7ff; }
         footer { background: #333; color: white; text-align: center; padding: 10px; margin-top: 30px; }
+        .passenger-list { margin: 0; padding-left: 1rem; }
     </style>
 </head>
 <body>
+    <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="/">RideSwift</a>
+            <a class="navbar-brand fw-bold" href="/">RideSwift</a>
             <div>
                 <a class="nav-link d-inline text-white" href="/">Home</a>
                 <a class="nav-link d-inline text-white" href="/routes">Routes</a>
@@ -22,44 +27,48 @@
         </div>
     </nav>
 
+    <!-- Booking History Section -->
     <div class="container mt-5">
-        <h2 class="mb-4">All Bookings</h2>
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>User</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Route</th>
-                    <th>Journey Date</th>
-                    <th>Passengers</th>
-                    <th>Total Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for booking in bookings %}
-                <tr>
-                    <td>{{ booking[0] }}</td>
-                    <td>{{ booking[1] }}</td>
-                    <td>{{ booking[2] }}</td>
-                    <td>{{ booking[3] }}</td>
-                    <td>{{ booking[7] }} ({{ booking[8] }})</td>
-                    <td>{{ booking[5] }}</td>
-                    <td>
-                        <ul>
-                            {% for p in booking[4] %}
-                            <li>{{ p.name }} (Age: {{ p.age }})</li>
-                            {% endfor %}
-                        </ul>
-                    </td>
-                    <td>₹{{ booking[6] }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <h2 class="mb-4 text-center">All Bookings (Sorted by Journey Date)</h2>
+        <div class="table-container shadow">
+            <table class="table table-bordered table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Route</th>
+                        <th>Journey Date</th>
+                        <th>Passengers</th>
+                        <th>Total Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking[0] }}</td>
+                        <td>{{ booking[1] }}</td>
+                        <td>{{ booking[2] }}</td>
+                        <td>{{ booking[3] }}</td>
+                        <td>{{ booking[7] }} ({{ booking[8] }})</td>
+                        <td>{{ booking[5] }}</td>
+                        <td>
+                            <ul class="passenger-list">
+                                {% for p in booking[4] %}
+                                <li>{{ p.name }} (Age: {{ p.age }})</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td><strong>₹{{ booking[6] }}</strong></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 
+    <!-- Footer -->
     <footer>
         &copy; 2025 RideSwift Bus Booking | All Rights Reserved.
     </footer>

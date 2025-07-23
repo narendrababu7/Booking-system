@@ -5,12 +5,12 @@ app = Flask(__name__)
 
 DB_NAME = 'bus_ticket_system.db'
 
-# Initialize database (reset routes so all 11 are always loaded)
+# Initialize database (reset routes and booking ID counter)
 def init_db():
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
 
-    # Create tables
+    # Create tables if not exist
     c.execute('''CREATE TABLE IF NOT EXISTS routes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 route_name TEXT,
@@ -30,8 +30,12 @@ def init_db():
                 total_price REAL,
                 FOREIGN KEY(route_id) REFERENCES routes(id)
                 )''')
+    
 
-    # Clear old routes and load fresh data
+    c.execute("DELETE FROM bookings")
+    c.execute("DELETE FROM sqlite_sequence WHERE name='bookings'")
+
+    # Reset routes (fresh data every run)
     c.execute("DELETE FROM routes")
     sample_routes = [
         ("Anantapur → Kadiri", "10:00 AM", 200, 50),
@@ -43,10 +47,13 @@ def init_db():
         ("Delhi → Jammu", "09:15 AM", 600, 30),
         ("Kota → Jaipur", "07:00 PM", 380, 45),
         ("Udaipur → Mount Abu", "03:20 PM", 480, 40),
-        ("East godavari → Kakinada", "01:10 PM", 350, 60),
+        ("East Godavari → Kakinada", "01:10 PM", 350, 60),
         ("Sikar → Jhunjhunu", "04:40 PM", 300, 55)
     ]
     c.executemany("INSERT INTO routes (route_name, departure_time, price, available_seats) VALUES (?,?,?,?)", sample_routes)
+
+    # Reset the auto-increment counter for bookings so IDs start from 1
+    c.execute("DELETE FROM sqlite_sequence WHERE name='bookings'")
 
     conn.commit()
     conn.close()
@@ -101,7 +108,7 @@ def book_ticket(route_id):
                     VALUES (?,?,?,?,?,?,?)""",
                   (name, email, phone, route_id, passengers_json, journey_date, total_price))
         conn.commit()
-        booking_id = c.lastrowid
+        booking_id = c.lastrowid  # This will now start at 1 after reset
         conn.close()
 
         return redirect(url_for('success', booking_id=booking_id))
@@ -123,21 +130,22 @@ def success(booking_id):
     passengers = json.loads(booking[4])
     return render_template('success.html', booking=booking, passengers=passengers)
 
-# View all bookings (history)
+# Booking history
 @app.route('/history')
 def history():
     conn = sqlite3.connect(DB_NAME)
     c = conn.cursor()
     c.execute("""SELECT b.id, b.user_name, b.email, b.phone, b.passengers, b.date, b.total_price,
-                 r.route_name, r.departure_time 
-                 FROM bookings b 
-                 JOIN routes r ON b.route_id = r.id ORDER BY b.id DESC""")
+             r.route_name, r.departure_time 
+             FROM bookings b 
+             JOIN routes r ON b.route_id = r.id 
+             ORDER BY b.id ASC""")  # Booking IDs will now be sequential
     bookings = c.fetchall()
     conn.close()
 
     for i, booking in enumerate(bookings):
         bookings[i] = list(booking)
-        bookings[i][4] = json.loads(booking[4])  # passengers
+        bookings[i][4] = json.loads(booking[4])  # Parse passengers JSON
     return render_template('history.html', bookings=bookings)
 
 if __name__ == '__main__':
